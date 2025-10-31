@@ -78,10 +78,6 @@ classdef Gas < handle
     thermalConductivity = [];            % thermal conductivity
     thermalConductivityFunc = [];        % handle to function that evaluates the thermal conductivity
     thermalConductivityParams = {};      % cell array of parameters needed by thermalConductivityFunc
-
-    inFlowFraction = 0;                  % inflow fraction in the gas mixture
-    inFlowFractionFunc = [];             % handle to function that evaluates inflow fraction of the gas
-    inFlowFractionParams = {};           % cell array of parameters needed by inFlowFractionFunc
                                          
     stateArray;                          % State array with all the states of the gas (initialized in the subclass)
 
@@ -205,7 +201,7 @@ classdef Gas < handle
         error('Electronic/ionic distribution %s is not properly normalised. (Error = %e)\n', stateDistName, gasNorm-1);
       end
 
-    end  
+    end
 
     function renormalizeWithDensities(gas)
     % renormalizeWithDensities is a function that obtain new "populations" of the states of a gas once their
@@ -307,7 +303,7 @@ classdef Gas < handle
         state.evaluateDensity();
       end
 
-    end  
+    end
     
     function massLocal = evaluateMass(gas, workCond)
       
@@ -490,21 +486,6 @@ classdef Gas < handle
       
     end
 
-    function inFlowFractionLocal = evaluateInFlowFraction(gas, workCond)
-      
-      % checks if the property is to be evaluated with a function or a fixed parameter
-      if isempty(gas.inFlowFractionFunc)
-        % return fixed parameter
-        inFlowFractionLocal = gas.inFlowFraction;
-      else
-        % call function to evaluate the value of the property
-        inFlowFractionLocal = gas.inFlowFractionFunc(gas, gas.inFlowFractionParams, workCond);
-        % save local value in object properties
-        gas.inFlowFraction = inFlowFractionLocal;
-      end
-      
-    end    
-        
   end
 
   methods (Static)
@@ -580,7 +561,7 @@ classdef Gas < handle
         end
       end
 
-    end   
+    end
 
   end
 

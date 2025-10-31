@@ -1,0 +1,22 @@
+-> linha 1600
+
+auxA e auxB têm pelo menos 2 elementos (inicio e fim) problemáticos: o velho problema de não existir weightGrid -> boundary conditions are zero, maybe there's no problem (pag. 29 non_uniform.pdf) ok
+
+-> linha 1861
+
+tive que transpor A e B
+
+-> eq. da potencia (pag. 29 non_unif) não dá = à do uniforme (pag. 33)
+
+-> linha 1864 
+
+casos extremos: (1) e (N) -> como fazer?
+
+-> power.electronElectronNet
+
+
+-----------
+
+check primeiro condições perfeitas -> so depois comparar com uniforme
+
+variar delta u (reduzir - não aumentar)

@@ -77,31 +77,17 @@ classdef Setup < handle
       setup.fileName = fileName;
       notify(setup, 'genericStatusMessage', StatusEventData('Parsing setup file ...\n', 'status'));
       start = tic;
-
-      if endsWith(fileName, '.json')
-
-        [setupStruct, setupCell] = Parse.setupFileJson(fileName);
-        str = sprintf('  Finished (%f seconds).\\n', toc(start));
-        notify(setup, 'genericStatusMessage', StatusEventData(str, 'status'));
-        % save unstructured setup info for output and GUI
-        setup.unparsedInfo = setupCell;
-        % save structured info to set up the different components of the simulation
-        setup.info = setupStruct;
-
-      else
-
-        [setupStruct, setupCell] = Parse.setupFile(fileName);
-        str = sprintf('  Finished (%f seconds).\\n', toc(start));
-        notify(setup, 'genericStatusMessage', StatusEventData(str, 'status'));
-        % save unstructured setup info for output and GUI
-        setup.unparsedInfo = setupCell;
-        % save structured info to set up the different components of the simulation
-        setup.info = setupStruct;
+      [setupStruct, setupCell] = Parse.setupFile(fileName);
+      str = sprintf('  Finished (%f seconds).\\n', toc(start));
+      notify(setup, 'genericStatusMessage', StatusEventData(str, 'status'));
+      % save unstructured setup info for output and GUI
+      setup.unparsedInfo = setupCell;
+      % save structured info to set up the different components of the simulation
+      setup.info = setupStruct;
       
-      end
-
       % Perform a diagnostic of the correctness of the configuration provided by the user
       notify(setup, 'genericStatusMessage', StatusEventData('Performing selfdiagnostic of the setup file ...\n', 'status'));
+      start = tic;
       setup.selfDiagnostic();
       str = sprintf('  Finished (%f seconds).\\n', toc(start));
       notify(setup, 'genericStatusMessage', StatusEventData(str, 'status'));
@@ -134,7 +120,7 @@ classdef Setup < handle
       % ----- SETTING UP THE WORKING CONDITIONS OF THE SIMULATION -----
       % setting up the working conditions
       setup.workCond = WorkingConditions(setup);
-
+      
       % ----- SETTING UP THE ELECTRON KINETICS (LoKI-B) -----
       if isfield(setup.info, 'electronKinetics') && setup.info.electronKinetics.isOn
         setup.enableElectronKinetics = true;
@@ -229,6 +215,7 @@ classdef Setup < handle
       
       % setup next job (if there are)
       if setup.currentJobID <= setup.numberOfJobs
+        
         % obtain old and new job indices
         if isscalar(setup.jobMatrixSize) % single batch case (runs over different values of a single working condition)
           oldJobIndeces{1} = setup.currentJobID-1;
@@ -237,7 +224,7 @@ classdef Setup < handle
           [oldJobIndeces{1:setup.numberOfBatches}] = ind2sub(setup.jobMatrixSize, setup.currentJobID-1);
           [newJobIndeces{1:setup.numberOfBatches}] = ind2sub(setup.jobMatrixSize, setup.currentJobID);
         end
-        
+                
         % obtain properties that needs to be updated and the updated values
         propertiesToUpdate = cell.empty;
         newValues = [];
@@ -291,40 +278,6 @@ classdef Setup < handle
   
   methods (Access = private)
     
-    function LXCatEntryArray = parseLXCatFiles(~, fileList) 
-      % parseLXCatFiles parses LXCat files (both .txt and .json) from a file list
-      % Input: fileList - cell array of file paths (or single file)
-      % Output: LXCatEntryArray - array of parsed LXCat entries
-      
-      % if it's not empty and is not a cell array, turn into cell array
-      if ~isempty(fileList) & ~iscell(fileList)
-        fileList = {fileList};
-      end
-
-      txtFiles = {};
-      jsonFiles = {};
-      
-      % Distinguish between .txt and .json files
-      for i = 1:length(fileList)
-        if endsWith(fileList{i}, '.json')
-          jsonFiles{end+1} = fileList{i};  
-        else
-          txtFiles{end+1} = fileList{i};
-        end
-      end
-
-      % Parse .txt files
-      if ~isempty(txtFiles)
-        LXCatEntryArray = Parse.LXCatFiles(txtFiles);
-      else
-        LXCatEntryArray = [];
-      end
-      % Parse .json files
-      if ~isempty(jsonFiles)
-        LXCatEntryArray = [LXCatEntryArray, Parse.LXCatFilesJson(jsonFiles)];
-      end
-    end
-    
     function [gasArray, stateArray, collisionArray] = LXCatData(setup)
       % LXCatData parses the LXCat files (regular or extra) included in the 
       % setup and create the corresponding arrays of gases, states and 
@@ -338,16 +291,8 @@ classdef Setup < handle
       stateArray = EedfState.empty;
       collisionArray = Collision.empty;
       
-
-      % Parse the LXCat files using the helper function
-      LXCatEntryArray = [];
-      if ~isempty(setup.info.electronKinetics.LXCatFiles)
-        % if it's not empty and is not a cell array, turn into cell array
-        if ~iscell(setup.info.electronKinetics.LXCatFiles)
-          setup.info.electronKinetics.LXCatFiles = {setup.info.electronKinetics.LXCatFiles};
-        end
-        LXCatEntryArray = setup.parseLXCatFiles(setup.info.electronKinetics.LXCatFiles);
-      end
+      % parse LXCat files
+      LXCatEntryArray = Parse.LXCatFiles(setup.info.electronKinetics.LXCatFiles);
       
       % create gases, states and collisions from the LXCat parsed info
       for LXCatEntry = LXCatEntryArray
@@ -371,17 +316,11 @@ classdef Setup < handle
       
       % create "extra" collisions (and correspponding gases/states) in case they are specified in the setup file
       if isfield(setup.info.electronKinetics, 'LXCatFilesExtra')
-        % if it's not empty and is not a cell array, turn into cell array
-        if ~isempty(setup.info.electronKinetics.LXCatFilesExtra) & ...
-            ~iscell(setup.info.electronKinetics.LXCatFilesExtra)
-          setup.info.electronKinetics.LXCatFilesExtra = {setup.info.electronKinetics.LXCatFilesExtra};
-        end
-        % Parse LXCat extra files using the helper function
-        LXCatEntryArrayExtra = setup.parseLXCatFiles(setup.info.electronKinetics.LXCatFilesExtra);
-
-                
+        % parse LXCat extra files
+        LXCatEntryArray = Parse.LXCatFiles(setup.info.electronKinetics.LXCatFilesExtra);
+        
         % create gases, states and collisions from the LXCat parsed info
-        for LXCatEntry = LXCatEntryArrayExtra
+        for LXCatEntry = LXCatEntryArray
           [gasArray, gasID] = Gas.add(LXCatEntry.target.gasName, gasArray);
           [stateArray, targetID] = State.add(gasArray(gasID), LXCatEntry.target.ionCharg, ...
             LXCatEntry.target.eleLevel, LXCatEntry.target.vibLevel, LXCatEntry.target.rotLevel, stateArray);
@@ -480,9 +419,8 @@ classdef Setup < handle
           if isfield(parsedEntry, 'fileName')
             stateAndValueArray = Parse.statePropertyFile(parsedEntry.fileName);
             for stateAndValue = stateAndValueArray
-              stateID = State.find(stateAndValue.gasName, stateAndValue.ionCharg, ...
-                stateAndValue.eleLevel, stateAndValue.vibLevel, ...
-                stateAndValue.rotLevel, stateArray);
+              stateID = State.find(stateAndValue.gasName, stateAndValue.ionCharg, stateAndValue.eleLevel, ...
+                stateAndValue.vibLevel, stateAndValue.rotLevel, stateArray);
               if stateID == -1
                 continue;
               end
@@ -582,7 +520,7 @@ classdef Setup < handle
         end
         % check for the distribution of states to be properly normalised
         gas.checkPopulationNorms();
-        % check for Elastic collisions to be defined, for each target state
+        % check for an Elastic collision to be defined, for each electronic state with population
         collisionArray = gas.checkElasticCollisions(collisionArray);
       end
 
@@ -636,26 +574,12 @@ classdef Setup < handle
 
       % define strings used in all error messages
       str1 = '\nError found in the configuration of the setup file.\n';
-      str1w = '\nWarning about the configuration of the setup file.\n';
       str2 = '\nPlease, fix the problem and run the code again.';
       
       % check working conditions
-      % check whether the mandatory fields of the working conditions module are present 
       workCondStruct = setupInfo.workingConditions;
-      if ~isfield(workCondStruct, 'reducedField') && ~isfield(workCondStruct, 'electronTemperature')
-        error([str1 '''reducedField'' and ''electronTemperature'' mandatory fields not found\n' ...
-            'in the ''workingConditions'' section of the setup file.' str2],1);
-      elseif ~isfield(workCondStruct, 'excitationFrequency')
-        error([str1 '''excitationFrequency'' mandatory field not found' ...
-            ' in the ''workingConditions'' section of the setup file.' str2],1);
-      elseif ~isfield(workCondStruct, 'gasTemperature')
-        error([str1 '''gasTemperature'' mandatory field not found' ...
-            ' in the ''workingConditions'' section of the setup file.' str2],1);
-      end  
-
-
       % check input for 'reducedField' field in working conditions to know if simulation is in pulsed mode
-      if isfield(workCondStruct, 'reducedField') && ischar(workCondStruct.reducedField)
+      if ischar(workCondStruct.reducedField)
         % configuration for pulsed simulations: pulse@functionName, firstStep, finalTime, samplingType, samplingPoints, additionalParameters
         pulseInfoAux = regexp(workCondStruct.reducedField, ['pulse@\s*(?<function>\w+)\s*,\s*' ...
           '(?<firstStep>[\(\)^\d.eE+-]+)\s*,\s*(?<finalTime>[\(\)^\d.eE+-]+)\s*,\s*(?<samplingType>linspace|logspace)\s*,\s*' ...
@@ -729,9 +653,8 @@ classdef Setup < handle
             error([str1 '''eedfType'' field not found in the ' ...
               '''electronKinetics'' section of the setup file.' str2],1);
           elseif ~any(strcmp({'boltzmann' 'prescribedEedf'}, setupInfo.electronKinetics.eedfType))
-            error(['Error found in the configuration of the setup file.\nWrong value for the field ' ...
-              '''electronKinetics>eedfType''.\nValue should be either: ''boltzmann'' or ''prescribedEedf''.\n' ...
-              'Please, fix the problem and run the code again.'],1);
+            error([str1 'Wrong value for the field ' ...
+              '''electronKinetics>eedfType''.\nValue should be either: ''boltzmann'' or ''prescribedEedf''.' str2],1);
           elseif strcmp(setupInfo.electronKinetics.eedfType, 'prescribedEedf')
             % check whether the shapeParameter field is present and the value is correct (double between 1 and 2)
             if ~isfield(setupInfo.electronKinetics, 'shapeParameter')
@@ -773,8 +696,8 @@ classdef Setup < handle
               '''electronKinetics>includeEECollisions''.\nValue should be logical (''true'' or ''false'').' str2],1);
           elseif setupInfo.electronKinetics.includeEECollisions
             if ~isfield(workCondStruct, 'electronDensity')
-              error([str1 '''electronDensity'' (mandatory field for ''electronKinetics.includeEECollisions=true'')\n' ...
-                'not found in the ''workingConditions'' section of the setup file.' str2],1);
+              error([str1 '''electronDensity'' field not found ' ...
+                'in the ''workingConditions'' section of the setup file.' str2],1);
             end
           end
           % --- 'LXCatFiles' field

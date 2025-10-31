@@ -54,7 +54,7 @@ classdef Collision < handle
   end
 
   properties (Constant = true)
-    supportedCollisions = {'Effective' 'Elastic' 'Rotational' 'Vibrational' 'Ionization' 'Attachment' 'Excitation'};
+    supportedCollisions = {'Effective' 'Elastic' 'Rotational' 'Vibrational' 'Excitation' 'Ionization' 'Attachment'};
   end
 
   methods (Access = public)
@@ -110,7 +110,7 @@ classdef Collision < handle
             'for binary collisions'], collision.description);
         end
       end
-      if strcmp(type, 'Effective') && ~strcmp(target.type, 'ele')
+      if any(strcmp(type, {'Effective' 'Elastic'})) && ~strcmp(target.type, 'ele')
         error(['Found ''%s'' collision with ''%s'' as target [%s].\n%s collisions are only allowed for ' ...
           'electronic states, please check LXCat files.\n'], type, target.name, collision.description, type);
       end
@@ -182,7 +182,7 @@ classdef Collision < handle
     
       % check that 'Elastic' cross section is available for the maximum value of the energy grid
       if strcmp(collision.type, 'Elastic')
-        if energyGrid.node(end) > collision.rawCrossSection(1,end)
+        if energyGrid.node(end) > collision.rawCrossSection(1:end)
           error(['''%s'' cross section data is not available for the maximum energy of the simulation (%f eV).\n'...
             'Simulation is not reliable under this conditions.'], collision.description, energyGrid.node(end));
         end
@@ -313,12 +313,26 @@ classdef Collision < handle
     
       % evaluate auxiliary variables
       gamma = Constant.gamma;
-      lmin = floor(collision.threshold/collision.energyGrid.step);
+      
+      % uniform energy grid
+%       lmin = floor(collision.threshold/collision.energyGrid.step);
+
+%       % debugging - uniform energy grid
+%       lmin = floor(collision.threshold/collision.energyGrid.energyStep(1));
+
+%       % variable energy grid
+       lmin = collision.energyGrid.findCellNumber(collision.threshold);
+%  
+%       
       cellCrossSection = (collision.crossSection(lmin+1:end-1)+collision.crossSection(lmin+2:end))./2;
       aux = cellCrossSection.*collision.energyGrid.cell(lmin+1:end);
-    
-      % evaluate inelastic rate coefficient
-      ineRateCoeff = gamma*sum(aux.*eedf(lmin+1:end))*collision.energyGrid.step;
+
+      % evaluate inelastic rate coefficient - uniform energy grid
+%       ineRateCoeff = gamma * sum(aux .* eedf(lmin+1:end)) * collision.energyGrid.energyStep;
+
+      
+      % evaluate inelastic rate coefficient - variable energy grid
+      ineRateCoeff = gamma*sum(aux.*eedf(lmin+1:end).*collision.energyGrid.energyStep(lmin+1:end));
       collision.ineRateCoeff = ineRateCoeff;
       
       % evaluate superelastic rate coefficient (if collision is reverse)
@@ -352,9 +366,11 @@ classdef Collision < handle
       
       % check that 'Elastic' cross section is available for the maximum value of the energy grid
       if strcmp(collision.type, 'Elastic')
-        if energyGrid.node(end) > collision.rawCrossSection(1,end)
+        if energyGrid.node(end) > collision.rawCrossSection(1:end)
           error(['''%s'' cross section data is not available for the maximum energy of the simulation (%f eV).\n'...
-            'Simulation is not reliable under this conditions.'], collision.description, energyGrid.node(end));
+            'The cross section is set to zero beyond %f eV .\n'...  
+            'Simulation is not reliable under this conditions.'], collision.description, energyGrid.node(end), ...
+            collision.rawCrossSection(1,end));
         end
       end
       

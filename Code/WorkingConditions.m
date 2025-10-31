@@ -44,10 +44,6 @@ classdef WorkingConditions < handle
     reducedFieldSI = [];
     excitationFrequency = [];
     reducedExcFreqSI = [];
-    dischargeCurrent = [];
-    dischargePowerDensity = [];
-    totalSccmInFlow = [];
-    totalSccmOutFlow = [];
     currentTime = [];             % only used for time-dependent calculations 
   end
   
@@ -59,7 +55,7 @@ classdef WorkingConditions < handle
     updatedElectronTemperature
     updatedChamberLength
     updatedReducedField
-    updatedReducedExcitationFrequency
+    updatedExcitationFrequency
     genericStatusMessage
   end
   
@@ -90,14 +86,6 @@ classdef WorkingConditions < handle
         workCond.areaOverVolume = 2./workCond.chamberLength;
         workCond.volumeOverArea = 1./workCond.areaOverVolume;
       end
-      if isfield(setup.info.workingConditions, 'totalSccmOutFlow') && ...
-          ~isnumeric(setup.info.workingConditions.totalSccmOutFlow) 
-        if strcmp(setup.info.workingConditions.totalSccmOutFlow,'totalSccmInFlow')
-          workCond.totalSccmOutFlow = workCond.totalSccmInFlow;
-        else
-          workCond.totalSccmOutFlow = [];
-        end  
-      end
       
     end
     
@@ -117,7 +105,7 @@ classdef WorkingConditions < handle
             workCond.reducedExcFreqSI = workCond.excitationFrequency*2*pi/workCond.gasDensity;
             notify(workCond, 'updatedGasPressure');
             notify(workCond, 'updatedGasDensity');
-            notify(workCond, 'updatedReducedExcitationFrequency');
+            notify(workCond, 'updatedExcitationFrequency');
             str = sprintf('\\t- Updated gas pressure (%g Pa).\\n', newValues(idx));
 
           case 'gasTemperature'
@@ -125,7 +113,7 @@ classdef WorkingConditions < handle
             workCond.reducedExcFreqSI = workCond.excitationFrequency*2*pi/workCond.gasDensity;
             notify(workCond, 'updatedGasTemperature'); 
             notify(workCond, 'updatedGasDensity');
-            notify(workCond, 'updatedReducedExcitationFrequency');
+            notify(workCond, 'updatedExcitationFrequency');
             str = sprintf('\\t- Updated gas temperature (%g K).\\n', newValues(idx));
 
           case 'electronDensity'

@@ -376,7 +376,7 @@ classdef Output < handle
               offset(1) = 0;
               offset(2:10) = cumsum(sz(1:9));
               name = ["Field" "Elastic" "CAR" "Rotational" "Vibrational" ...
-                "Electronic" "Ionization" "Attachment" "eDensGrowth" "Balance"];
+                "Excitation" "Ionization" "Attachment" "eDensGrowth" "Balance"];
               ctypeID = H5T.create('H5T_COMPOUND', sum(sz));
               for i = 1:length(sz)
                 H5T.insert(ctypeID,name(i),offset(i),doubleType);
@@ -991,7 +991,7 @@ classdef Output < handle
         fprintf(fileID, ' %s\n', repmat('-', 1, 73));
         fprintf(fileID, '            Elastic collisions (net) = %#+.14e (eVm^3s^-1)\n\n', power.elasticNet);
         fprintf(fileID, '                          CAR (gain) = %#+.14e (eVm^3s^-1)\n', power.carGain);
-        fprintf(fileID, '                          CAR (loss) = %#+.14e (eVm^3s^-1) +\n', power.carLoss);
+        fprintf(fileID, '                          CAR (gain) = %#+.14e (eVm^3s^-1) +\n', power.carLoss);
         fprintf(fileID, ' %s\n', repmat('-', 1, 73));
         fprintf(fileID, '                           CAR (net) = %#+.14e (eVm^3s^-1)\n\n', power.carNet);
         fprintf(fileID, '     Excitation inelastic collisions = %#+.14e (eVm^3s^-1)\n', power.excitationIne);
@@ -1040,22 +1040,22 @@ classdef Output < handle
         sz(1:10) = H5T.get_size(doubleType);
         offset(1) = 0;
         offset(2:10) = cumsum(sz(1:9));
-        name = ["Field" "Elastic" "CAR" "Rotational" "Vibrational" "Electronic" ...
+        name = ["Field" "Elastic" "CAR" "Rotational" "Vibrational" "Excitation" ...
           "Ionization" "Attachment" "eDensGrowth" "Balance"];
         memtype = H5T.create('H5T_COMPOUND', sum(sz));
         for i = 1:length(sz)
           H5T.insert(memtype,name(i),offset(i),doubleType);
         end
-        powerSummary.field = [dataSummary(1) dataSummary(1) 0];                        % field
-        powerSummary.elastic = dataSummary(2:4);                                       % elastic
-        powerSummary.CAR = dataSummary(5:7);                                           % CAR
-        powerSummary.rotational = [dataSummary(16) dataSummary(15) dataSummary(14)];   % rotational
-        powerSummary.vibrational = [dataSummary(13) dataSummary(12) dataSummary(11)];  % vibrational
-        powerSummary.electronic = [dataSummary(10) dataSummary(9) dataSummary(8)];     % electronic
-        powerSummary.ionization = [dataSummary(17) 0 dataSummary(17)];                 % ionization
-        powerSummary.attachment = [dataSummary(18) 0 dataSummary(18)];                 % attachment
-        powerSummary.eDensGrowth = [dataSummary(21) dataSummary(21) 0];                % eDensGrowth
-        powerSummary.balance = [dataSummary(25) dataSummary(26) 0];                    % balance and relativeBalance
+        powerSummary.field = [dataSummary(1) 0 0];                  % field
+        powerSummary.elastic = dataSummary(2:4);                    % elastic
+        powerSummary.CAR = dataSummary(5:7);                        % CAR
+        powerSummary.rotational = dataSummary(8:10);                % rotational
+        powerSummary.vibrational = dataSummary(11:13);              % vibrational
+        powerSummary.excitation = dataSummary(14:16);               % excitation
+        powerSummary.ionization = [dataSummary(17) 0 0];            % ionization
+        powerSummary.attachment = [dataSummary(18) 0 0];            % attachment
+        powerSummary.eDensGrowth = [dataSummary(21) 0 0];           % eDensGrowth
+        powerSummary.balance = [dataSummary(25) dataSummary(26) 0]; % balance and relativeBalance
         % Process the hdf5 file
         fID = H5F.open(output.h5file, "H5F_ACC_RDWR", "H5P_DEFAULT");
         % powerBalanceSummary
@@ -1085,11 +1085,11 @@ classdef Output < handle
         for i = 1:length(gases)
           gas = gases{i};
           temp = struct2cell(power.gases.(gas));
-          powerGas.rot = [cell2mat(temp(9)) cell2mat(temp(8)) cell2mat(temp(7))];
-          powerGas.vib = [cell2mat(temp(6)) cell2mat(temp(5)) cell2mat(temp(4))];
-          powerGas.ele = [cell2mat(temp(1)) cell2mat(temp(2)) cell2mat(temp(1))];
-          powerGas.ion = [cell2mat(temp(10)) 0 cell2mat(temp(10))];
-          powerGas.att = [cell2mat(temp(11)) 0 cell2mat(temp(11))];
+          powerGas.rot = cell2mat(temp(1:3));
+          powerGas.vib = cell2mat(temp(4:6));
+          powerGas.ele = cell2mat(temp(7:9));
+          powerGas.ion = [cell2mat(temp(10)) 0 0];
+          powerGas.att = [cell2mat(temp(11)) 0 0];
           % DEBUG:
           % powerGas also includes inelastic and superelastic fields,
           % these fiels are NOT included in the initial definition!

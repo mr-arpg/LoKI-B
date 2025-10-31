@@ -1027,7 +1027,6 @@ classdef GUI < handle
     function updateSwarmParamInfo(gui, solutionID)
     
       % save local copy of the solution
-      electronDensity = gui.solutions(solutionID).workCond.electronDensity;
       swarmParam = gui.solutions(solutionID).swarmParam;
       reducedField = gui.solutions(solutionID).workCond.reducedField;
       % create information to display

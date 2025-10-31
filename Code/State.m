@@ -66,12 +66,6 @@ classdef State < handle
     reducedMobilityFunc = [];       % handle to function that evaluates the reduced free mobility
     reducedMobilityParams = {};     % cell array of parameters needed by reducedMobillityFunc
     
-    flowBarrier = [];               % flow (factor) barrier 
-    
-    inFlowPopulation = 0;           % inflow population of the state relative to its siblings
-    inFlowPopulationFunc = [];      % handle to function that evaluates the inflow population 
-    inFlowPopulationParams = {};    % cell array of parameters needed by inFlowPopulationFunc    
-    
     gasTemperatureListener = [];    % handle to the listener of changes in gas temperature (working conditions property)
     
   end
@@ -298,22 +292,7 @@ classdef State < handle
       end
       
     end
-
-    function inFlowPopulationLocal = evaluateInFlowPopulation(state, workCond)
-      
-      % checks if the property is to be evaluated with a function or a fixed parameter
-      if isempty(state.inFlowPopulationFunc)
-        % return fixed parameter
-        inFlowPopulationLocal = state.inFlowPopulation;
-      else
-        % call function to evaluate the value of the property
-        inFlowPopulationLocal = state.inFlowPopulationFunc(state, state.inFlowPopulationParams, workCond);
-        % save local value in object properties
-        state.inFlowPopulation = inFlowPopulationLocal;
-      end
-      
-    end    
-        
+    
   end
   
   methods (Static)
@@ -344,12 +323,9 @@ classdef State < handle
     
     function stateID = find(gasName, ionCharg, eleLevel, vibLevel, ...
       rotLevel, stateArray)
-      % find looks for a state in the stateArray with the given parameters
-      % and returns the ID of the state. If the state is not found the
-      % function returns -1.
-
+      
       stateID = [];
-      if strcmp(eleLevel, Parse.wildCardChar) % if eleLevel=*
+      if strcmp(eleLevel, Parse.wildCardChar)
         for i = 1:length(stateArray)
           state = stateArray(i);
           if ( strcmp(gasName, state.gas.name) && ...
@@ -358,7 +334,7 @@ classdef State < handle
             break;
           end
         end
-      elseif strcmp(vibLevel, Parse.wildCardChar) % if vibLevel=*
+      elseif strcmp(vibLevel, Parse.wildCardChar)
         for i = 1:length(stateArray)
           state = stateArray(i);
           if ( strcmp(gasName, state.gas.name) && ...
@@ -368,7 +344,7 @@ classdef State < handle
             break;
           end
         end
-      elseif strcmp(rotLevel, Parse.wildCardChar) % if rotLevel=*
+      elseif strcmp(rotLevel, Parse.wildCardChar)
         for i = 1:length(stateArray)
           state = stateArray(i);
           if ( strcmp(gasName, state.gas.name) && ...
@@ -380,7 +356,6 @@ classdef State < handle
           end
         end
       else
-        % if no wildcard is used, find the state with the given parameters
         for i = 1:length(stateArray)
           state = stateArray(i);
           if ( strcmp(gasName, state.gas.name) && ...
