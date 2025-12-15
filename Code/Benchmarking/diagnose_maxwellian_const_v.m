@@ -1,14 +1,14 @@
 % ===============================================================
-% diagnose_druyvesteyn.m
-% Diagnóstico do teste Druyvesteyn - verificar cross section
+% diagnose_maxwellian_const_v.m
+% Diagnóstico do teste Maxwellian (nu=const) - verificar cross section
 % ===============================================================
 
 clear; clc; close all;
 
-fprintf('=== DIAGNÓSTICO DRUYVESTEYN ===\n\n');
+fprintf('=== DIAGNÓSTICO MAXWELLIAN (nu=const) ===\n\n');
 
 % Verificar se a cross section existe
-cs_file = 'Input/Druyvesteyn/constant_nu_elastic.txt';
+cs_file = 'Input/Maxwellian_const_v/constant_nu_elastic.txt';
 if ~exist(cs_file, 'file')
     error('Cross section não encontrada: %s', cs_file);
 end
@@ -55,17 +55,17 @@ sigma_h2_typical = 1e-19;  % m²
 ratio_typical = sigma_cs / sigma_h2_typical;
 
 fprintf('   H2 típico: ~%.3e m² (0.1-1 eV)\n', sigma_h2_typical);
-fprintf('   Druyvesteyn: %.3e - %.3e m²\n', min(sigma_cs), max(sigma_cs));
-fprintf('   Razão Druyvesteyn/H2: %.2f - %.2f\n', min(ratio_typical), max(ratio_typical));
+fprintf('   Maxwellian_const_v: %.3e - %.3e m²\n', min(sigma_cs), max(sigma_cs));
+fprintf('   Razão Maxwellian_const_v/H2: %.2f - %.2f\n', min(ratio_typical), max(ratio_typical));
 
 if mean(sigma_cs) > 1e-19
-    fprintf('   ⚠ AVISO: Cross section Druyvesteyn é %.1fx maior que H2 típico!\n', mean(sigma_cs)/sigma_h2_typical);
+    fprintf('   ⚠ AVISO: Cross section Maxwellian_const_v é %.1fx maior que H2 típico!\n', mean(sigma_cs)/sigma_h2_typical);
     fprintf('   Isto pode causar problemas numéricos.\n');
 elseif mean(sigma_cs) < 1e-21
-    fprintf('   ⚠ AVISO: Cross section Druyvesteyn é %.1fx menor que H2 típico.\n', sigma_h2_typical/mean(sigma_cs));
+    fprintf('   ⚠ AVISO: Cross section Maxwellian_const_v é %.1fx menor que H2 típico.\n', sigma_h2_typical/mean(sigma_cs));
     fprintf('   Isto pode ser OK se for intencional.\n');
 else
-    fprintf('   ✓ Cross section Druyvesteyn está na ordem de grandeza correta!\n');
+    fprintf('   ✓ Cross section Maxwellian_const_v está na ordem de grandeza correta!\n');
 end
 
 % Verificar nu = const
@@ -91,13 +91,13 @@ end
 figure('Position', [100, 100, 1400, 500]);
 
 subplot(1,3,1);
-loglog(energy_cs, sigma_cs, 'b-', 'LineWidth', 2, 'DisplayName', 'Druyvesteyn (nu=const)');
+loglog(energy_cs, sigma_cs, 'b-', 'LineWidth', 2, 'DisplayName', 'Maxwellian_const_v (nu=const)');
 hold on;
 % Linha de referência para H2 típico
 plot([1e-3, 1e1], [sigma_h2_typical, sigma_h2_typical], 'r--', 'LineWidth', 1.5, 'DisplayName', 'H2 typical');
 xlabel('Energy (eV)');
 ylabel('Cross Section (m²)');
-title('Cross Section: Druyvesteyn vs H2');
+title('Cross Section: Maxwellian_const_v vs H2');
 legend('Location', 'best');
 grid on;
 xlim([1e-3, 1e1]);
@@ -118,8 +118,8 @@ title('\nu Constancy Check');
 grid on;
 yline(0, 'k--', 'LineWidth', 1);
 
-saveas(gcf, 'Input/Druyvesteyn/cross_section_diagnostic.png');
-fprintf('\n✓ Gráficos salvos em Input/Druyvesteyn/cross_section_diagnostic.png\n');
+saveas(gcf, 'Input/Maxwellian_const_v/cross_section_diagnostic.png');
+fprintf('\n✓ Gráficos salvos em Input/Maxwellian_const_v/cross_section_diagnostic.png\n');
 
 fprintf('\n=== DIAGNÓSTICO COMPLETO ===\n');
 

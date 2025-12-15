@@ -1,27 +1,25 @@
-function [f0, energy_eV] = analytical_druyvesteyn(energy_range, n_points)
-% ANALYTICAL_DRUYVESTEYN Calcula a EEDF Druyvesteyn analítica
+function [f0, energy_eV] = analytical_maxwellian_const_v(energy_range, n_points)
+% ANALYTICAL_MAXWELLIAN_CONST_V Calcula a EEDF Maxwelliana analítica
+%   (obtida quando frequência de colisão é constante, nu = const)
 %
 % Inputs:
-%   T_eff_eV    - Temperatura efetiva em eV (relacionada com E/N)
-%   energy_range- [min_energy, max_energy] em eV (opcional, default [0, 5*T_eff_eV])
-%   n_points    - Número de pontos (opcional, default 500)
+%   energy_range- [min_energy, max_energy] em eV
+%   n_points    - Número de pontos
 %
 % Outputs:
-%   f0          - EEDF Druyvesteyn normalizada (eV^(-3/2))
+%   f0          - EEDF Maxwelliana normalizada (eV^(-3/2))
 %   energy_eV   - Array de energia (eV)
 %
-% A distribuição Druyvesteyn é obtida quando:
+% A distribuição Maxwelliana é obtida quando:
 %   - Há campo elétrico E/N não nulo
 %   - Colisões elásticas com frequência constante (nu = const, sigma ∝ 1/v)
 %   - Sem colisões inelásticas ou e-e
 %
-% A EEDF Druyvesteyn é dada por:
-%   f0(u) = C * sqrt(u) * exp(-B * u^2)
+% A EEDF Maxwelliana é dada por:
+%   f0(u) = C * exp(-u / T_eff)
 %
 % onde:
-%   B = (3*m*nu^2) / (2*e^2*E^2) = 0.549 / T_eff^2  (para normalização)
-%   C = constante de normalização
-%   T_eff é relacionado com E/N e propriedades do gás
+%   T_eff é a temperatura efetiva relacionada com E/N e propriedades do gás
 
     % if nargin < 2 || isempty(energy_range)
     %     energy_range = [0, 3*T_eff_eV];  % Druyvesteyn decai mais rápido

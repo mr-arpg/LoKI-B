@@ -1,10 +1,22 @@
 # 🚀 Guia de Execução - Benchmarking LoKI-B
 
+**⚠️ IMPORTANTE:** Todos os scripts de benchmarking estão na pasta `Benchmarking/`. Execute-os a partir da raiz do projeto (pasta `Code/`) para que os paths relativos funcionem corretamente.
+
+```matlab
+% Certifique-se de estar na raiz do projeto
+cd('C:/path/to/LoKI-B/Code')  % ajuste o path conforme necessário
+
+% Os scripts podem ser chamados diretamente:
+Benchmarking/test_benchmark_installation
+```
+
 ## 📋 Ordem de Execução
 
 ### 1️⃣ **Instalação e Verificação** (executar uma vez)
 
 ```matlab
+Benchmarking/test_benchmark_installation
+% ou simplesmente (se a pasta Benchmarking estiver no path):
 test_benchmark_installation
 ```
 
@@ -15,23 +27,23 @@ Verifica se todos os ficheiros necessários existem.
 ### 2️⃣ **Gerar Cross Sections** (executar uma vez, ou quando alterar parâmetros)
 
 ```matlab
-% Cross section Druyvesteyn (nu = const)
-generate_druyvesteyn_cross_section
+% Cross section Maxwellian_const_v (nu = const)
+Benchmarking/generate_maxwellian_const_v_cross_section
 
 % Cross section Dummy (sigma ≈ 0, para teste e-e)
-generate_dummy_elastic
+Benchmarking/generate_dummy_elastic
 ```
 
 **Saídas:**
-- `Input/Druyvesteyn/constant_nu_elastic.txt`
+- `Input/Maxwellian_const_v/constant_nu_elastic.txt`
 - `Input/Dummy/H2_dummy_elastic.txt`
 
 ---
 
-### 3️⃣ **Diagnóstico Druyvesteyn** (opcional, mas recomendado)
+### 3️⃣ **Diagnóstico Maxwellian_const_v** (opcional, mas recomendado)
 
 ```matlab
-diagnose_druyvesteyn
+Benchmarking/diagnose_maxwellian_const_v
 ```
 
 **Verifica:**
@@ -39,14 +51,14 @@ diagnose_druyvesteyn
 - ✓ Colision frequency ν é constante
 - ✓ Gera gráficos de verificação
 
-**Saída:** `Input/Druyvesteyn/cross_section_diagnostic.png`
+**Saída:** `Input/Maxwellian_const_v/cross_section_diagnostic.png`
 
 ---
 
 ### 4️⃣ **Executar Benchmarks Completos**
 
 ```matlab
-run_all_benchmarks
+Benchmarking/run_all_benchmarks
 ```
 
 **Executa 4 tipos de testes:**
@@ -63,9 +75,9 @@ run_all_benchmarks
    - E/N = 10 Td, apenas colisões e-e (gás ≈ 0)
    - Solução: Maxwellian a Te ≈ 1-2 eV
 
-4. **Druyvesteyn** (2 testes)
+4. **Maxwellian_const_v** (2 testes)
    - E/N = 100 Td, colisões elásticas com nu=const
-   - Solução: Druyvesteyn a Teff
+   - Solução: Maxwellian a Teff (não Druyvesteyn - confusão de nomenclatura corrigida)
 
 **Saída:** `Output/Output/comprehensive_benchmark/`
 
@@ -74,7 +86,7 @@ run_all_benchmarks
 ### 5️⃣ **Analisar Resultados**
 
 ```matlab
-analyze_all_benchmarks
+Benchmarking/analyze_all_benchmarks
 ```
 
 **Gera:**
@@ -92,7 +104,7 @@ analyze_all_benchmarks
 ### 6️⃣ **Teste de Eficiência** (opcional)
 
 ```matlab
-run_efficiency_test
+Benchmarking/run_efficiency_test
 ```
 
 **Objetivo:** Encontrar o número mínimo de pontos na malha variável que mantém erro < 1% vs uniforme.
@@ -134,10 +146,10 @@ run_efficiency_test
 - Te ≈ 1-2 eV (aquecimento por campo + e-e collisions)
 - **Diferente** do teste elastic!
 
-### Druyvesteyn (E/N=100 Td)
-- EEDF decai **super-exponencialmente** (cauda fina)
+### Maxwellian_const_v (E/N=100 Td, nu=const)
+- EEDF decai **exponencialmente** (Maxwellian)
 - Teff ≈ 2-3 eV
-- **Diferente** de Maxwellian!
+- **Nota:** Embora o nome antigo fosse "Druyvesteyn", o teste gera uma Maxwelliana porque ν=const (não σ=const)
 
 ---
 
@@ -162,28 +174,30 @@ run_efficiency_test
 
 ## 📁 Ficheiros Importantes
 
-### Scripts de Execução
-- `run_all_benchmarks.m` - Executa todos os benchmarks
-- `analyze_all_benchmarks.m` - Analisa resultados
-- `run_efficiency_test.m` - Teste de eficiência
+### Scripts de Execução (todos em `Benchmarking/`)
+- `Benchmarking/run_all_benchmarks.m` - Executa todos os benchmarks
+- `Benchmarking/analyze_all_benchmarks.m` - Analisa resultados
+- `Benchmarking/run_efficiency_test.m` - Teste de eficiência
+- `Benchmarking/run_comparison_benchmarks.m` - Comparação de grids
+- `Benchmarking/run_benchmark_simulations.m` - Simulações de benchmark
 
 ### Scripts de Geração
-- `generate_druyvesteyn_cross_section.m` - Cross section nu=const
-- `generate_dummy_elastic.m` - Cross section dummy (≈0)
+- `Benchmarking/generate_maxwellian_const_v_cross_section.m` - Cross section nu=const
+- `Benchmarking/generate_dummy_elastic.m` - Cross section dummy (≈0)
 
 ### Diagnóstico
-- `test_benchmark_installation.m` - Verificação inicial
-- `diagnose_druyvesteyn.m` - Diagnóstico cross section
+- `Benchmarking/test_benchmark_installation.m` - Verificação inicial
+- `Benchmarking/diagnose_maxwellian_const_v.m` - Diagnóstico cross section
 
 ### Funções Analíticas
-- `analytical_maxwellian.m` - EEDF Maxwellian
-- `analytical_druyvesteyn.m` - EEDF Druyvesteyn
+- `analytical_maxwellian.m` - EEDF Maxwellian (na raiz ou Benchmarking/)
+- `Benchmarking/analytical_maxwellian_const_v.m` - EEDF Maxwellian (nu=const)
 
-### Input Files
-- `Input/benchmark_maxwellian_elastic_*.in` - Teste Maxwellian elastic
-- `Input/benchmark_maxwellian_ee_*.in` - Teste Maxwellian e-e
-- `Input/benchmark_druyvesteyn_*.in` - Teste Druyvesteyn
-- `Input/benchmark_fixed_*.in` - Grid comparison
+### Input Files (todos em `Input/benchmark/`)
+- `Input/benchmark/benchmark_maxwellian_elastic_*.in` - Teste Maxwellian elastic
+- `Input/benchmark/benchmark_maxwellian_ee_*.in` - Teste Maxwellian e-e
+- `Input/benchmark/benchmark_maxwellian_const_v_*.in` - Teste Maxwellian_const_v (nu=const)
+- `Input/benchmark/benchmark_fixed_*.in` - Grid comparison
 
 ---
 
@@ -204,7 +218,7 @@ maxEnergy: 5
 
 ### Cross Section Values
 - **H2 real**: ~1×10⁻¹⁹ m²
-- **Druyvesteyn**: ~1×10⁻²¹ - 1×10⁻²⁰ m² (menor, OK)
+- **Maxwellian_const_v**: ~1×10⁻²¹ - 1×10⁻²⁰ m² (menor, OK)
 - **Dummy**: ~1×10⁻³⁰ m² (desprezável)
 
 ---

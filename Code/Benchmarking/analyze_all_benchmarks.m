@@ -72,11 +72,11 @@ if ~isempty(results_max_ee)
     plot_maxwellian_comparison(results_max_ee, figures_dir, 'ee');
 end
 
-% 2C: Druyvesteyn
-fprintf('2C: Druyvesteyn...\n');
-results_druy = analyze_druyvesteyn(output_base);
-if ~isempty(results_druy)
-    plot_druyvesteyn_comparison(results_druy, figures_dir);
+% 2C: Maxwellian_const_v
+fprintf('2C: Maxwellian_const_v...\n');
+results_maxwellian_const_v = analyze_maxwellian_const_v(output_base);
+if ~isempty(results_maxwellian_const_v)
+    plot_maxwellian_const_v_comparison(results_maxwellian_const_v, figures_dir);
 end
 
 % ===============================================================
@@ -275,23 +275,23 @@ function results = analyze_maxwellian_ee(output_base)
     fprintf('  Erro relativo - Variável: %.2f%%, Uniforme: %.2f%%\n', error_var*100, error_uni*100);
 end
 
-function results = analyze_druyvesteyn(output_base)
-    % Analisa teste Druyvesteyn
+function results = analyze_maxwellian_const_v(output_base)
+    % Analisa teste Maxwellian_const_v (nu=const)
     
     results = struct();
     E_N_Td = 100;  % Campo reduzido usado no teste
     
     % Ler resultados
-    folder_var = sprintf('%s/benchmark_druyvesteyn_variable', output_base);
+    folder_var = sprintf('%s/benchmark_maxwellian_const_v_variable', output_base);
     [eedf_var, energy_var] = read_eedf(folder_var);
     data_var = read_swarm_parameters(folder_var);
     
-    folder_uni = sprintf('%s/benchmark_druyvesteyn_uniform', output_base);
+    folder_uni = sprintf('%s/benchmark_maxwellian_const_v_uniform', output_base);
     [eedf_uni, energy_uni] = read_eedf(folder_uni);
     data_uni = read_swarm_parameters(folder_uni);
     
     if isempty(eedf_var) && isempty(eedf_uni)
-        fprintf('  Aviso: Nenhum resultado encontrado para Druyvesteyn\n');
+        fprintf('  Aviso: Nenhum resultado encontrado para Maxwellian_const_v\n');
         results = [];
         return;
     end
@@ -308,7 +308,7 @@ function results = analyze_druyvesteyn(output_base)
     
     % Calcular solução analítica
     energy_range = [0, max([max(energy_var), max(energy_uni)])];
-    [f0_analytical, energy_analytical] = analytical_druyvesteyn(energy_range, 2000);
+    [f0_analytical, energy_analytical] = analytical_maxwellian_const_v(energy_range, 2000);
     
     % Calcular erros
     if ~isempty(eedf_var)
@@ -626,8 +626,8 @@ function plot_maxwellian_comparison(results, figures_dir, test_type)
     fprintf('  Figura salva: %s\n', filename);
 end
 
-function plot_druyvesteyn_comparison(results, figures_dir)
-    % Plota comparação com Druyvesteyn analítica
+function plot_maxwellian_const_v_comparison(results, figures_dir)
+    % Plota comparação com Maxwellian_const_v analítica
     
     figure('Position', [100, 100, 1400, 500]);
     
@@ -704,9 +704,9 @@ function plot_druyvesteyn_comparison(results, figures_dir)
     end
     
     % Salvar figura
-    saveas(gcf, fullfile(figures_dir, 'druyvesteyn_comparison.png'));
-    savefig(gcf, fullfile(figures_dir, 'druyvesteyn_comparison.fig'));
-    fprintf('  Figura salva: druyvesteyn_comparison.png\n');
+    saveas(gcf, fullfile(figures_dir, 'maxwellian_const_v_comparison.png'));
+    savefig(gcf, fullfile(figures_dir, 'maxwellian_const_v_comparison.fig'));
+    fprintf('  Figura salva: maxwellian_const_v_comparison.png\n');
 end
 
 function generate_report(output_base, results_grid, results_max_elastic, results_max_ee, results_druy)
@@ -751,11 +751,11 @@ function generate_report(output_base, results_grid, results_max_elastic, results
         fprintf(fid, '  Erro relativo (Uniforme): %.2f%%\n\n', results_max_ee.uniform.error*100);
     end
     
-    if ~isempty(results_druy)
-        fprintf(fid, 'Druyvesteyn:\n');
-      %  fprintf(fid, '  Temperatura efetiva: %.2f eV\n', results_druy.T_eff_eV);
-        fprintf(fid, '  Erro relativo (Variável): %.2f%%\n', results_druy.variable.error*100);
-        fprintf(fid, '  Erro relativo (Uniforme): %.2f%%\n\n', results_druy.uniform.error*100);
+    if ~isempty(results_maxwellian_const_v)
+        fprintf(fid, 'Maxwellian_const_v:\n');
+      %  fprintf(fid, '  Temperatura efetiva: %.2f eV\n', results_maxwellian_const_v.T_eff_eV);
+        fprintf(fid, '  Erro relativo (Variável): %.2f%%\n', results_maxwellian_const_v.variable.error*100);
+        fprintf(fid, '  Erro relativo (Uniforme): %.2f%%\n\n', results_maxwellian_const_v.uniform.error*100);
     end
     
     fprintf(fid, '=================================================================\n');

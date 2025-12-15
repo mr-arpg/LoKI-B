@@ -24,7 +24,7 @@ for i = 1:length(N_values)
     fprintf('Running variable grid simulation with N = %d...\n', N);
     
     % Read the template file
-    fid = fopen('Input/benchmark_fixed_delta_u.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_fixed_delta_u.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -32,7 +32,7 @@ for i = 1:length(N_values)
     content = regexprep(content, 'cellNumber: \d+', sprintf('cellNumber: %d', N));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_variable_fixed_delta_u_N%d.in', N);
+    temp_file = sprintf('Input/benchmark/benchmark_variable_fixed_delta_u_N%d.in', N);
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
@@ -75,7 +75,7 @@ for i = 1:length(N_values)
     fprintf('Running uniform grid simulation with N = %d...\n', N);
     
     % Read the template file
-    fid = fopen('Input/benchmark_uniform_fixed_delta_u.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_uniform_fixed_delta_u.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -83,7 +83,7 @@ for i = 1:length(N_values)
     content = regexprep(content, 'cellNumber: \d+', sprintf('cellNumber: %d', N));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_uniform_fixed_delta_u_N%d.in', N);
+    temp_file = sprintf('Input/benchmark/benchmark_uniform_fixed_delta_u_N%d.in', N);
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
@@ -126,7 +126,7 @@ for i = 1:length(delta_u_values)
     fprintf('Running variable grid simulation with delta u = %.1e eV...\n', delta_u);
     
     % Read the template file
-    fid = fopen('Input/benchmark_fixed_N.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_fixed_N.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -134,7 +134,7 @@ for i = 1:length(delta_u_values)
     content = regexprep(content, 'firstEnergyStep: [\d\.e-]+', sprintf('firstEnergyStep: %.1e', delta_u));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_variable_fixed_N_delta_u_%s.in', num2str(delta_u, '%.0e'));
+    temp_file = sprintf('Input/benchmark/benchmark_variable_fixed_N_delta_u_%s.in', num2str(delta_u, '%.0e'));
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
@@ -177,7 +177,7 @@ for i = 1:length(delta_u_values)
     fprintf('Running uniform grid simulation with grid spacing = %.1e eV...\n', delta_u);
     
     % Read the template file
-    fid = fopen('Input/benchmark_uniform_fixed_N.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_uniform_fixed_N.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -189,7 +189,7 @@ for i = 1:length(delta_u_values)
     content = regexprep(content, 'maxEnergy: [\d\.]+', sprintf('maxEnergy: %.1e', maxEnergy));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_uniform_fixed_N_spacing_%s.in', num2str(delta_u, '%.0e'));
+    temp_file = sprintf('Input/benchmark/benchmark_uniform_fixed_N_spacing_%s.in', num2str(delta_u, '%.0e'));
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
@@ -223,4 +223,4 @@ end
 
 fprintf('\n=== Grid Comparison Benchmarking completed ===\n');
 fprintf('Results saved in Output/benchmark_comparison/\n');
-fprintf('Run analyze_grid_comparison.m to analyze the results\n'); 
+fprintf('Run Benchmarking/analyze_grid_comparison.m or Benchmarking/analyze_all_benchmarks.m to analyze the results\n'); 

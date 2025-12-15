@@ -4,6 +4,11 @@ from pathlib import Path
 import pandas as pd
 
 # Reuse the same helper functions from compare_grids.py
+# Note: Both scripts are in the same directory (Benchmarking/)
+# If running from the root directory, add Benchmarking to path:
+# import sys
+# from pathlib import Path
+# sys.path.insert(0, str(Path(__file__).parent))
 from compare_grids import load_eedf, load_swarm_params, load_rate_coeffs, load_power_balance, plot_parameter_evolution, plot_relative_difference
 
 def collect_all_data_highfields(base_path):

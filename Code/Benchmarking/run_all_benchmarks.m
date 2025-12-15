@@ -19,7 +19,7 @@ fprintf('=================================================================\n\n')
 run_grid_comparison = true;      % Comparação malha variável vs uniforme
 run_maxwellian_elastic = true;   % Teste Maxwelliano com colisões elásticas
 run_maxwellian_ee = true;        % Teste Maxwelliano com colisões e-e  
-run_druyvesteyn = true;          % Teste Druyvesteyn
+run_maxwellian_const_v = true;   % Teste Maxwellian (nu=const)
 
 % Parâmetros para teste de convergência (grid comparison)
 N_values = [50, 100, 200, 400];  % Valores de cellNumber a testar
@@ -39,7 +39,7 @@ config.delta_u_values = delta_u_values;
 config.tests_run = struct('grid_comparison', run_grid_comparison, ...
                           'maxwellian_elastic', run_maxwellian_elastic, ...
                           'maxwellian_ee', run_maxwellian_ee, ...
-                          'druyvesteyn', run_druyvesteyn);
+                          'maxwellian_const_v', run_maxwellian_const_v);
 save(fullfile(output_base, 'benchmark_config.mat'), 'config');
 
 % ===============================================================
@@ -179,26 +179,26 @@ if run_maxwellian_ee
 end
 
 % ===============================================================
-% TESTE 4: DRUYVESTEYN
+% TESTE 4: MAXWELLIAN (nu=const)
 % ===============================================================
 
-if run_druyvesteyn
-    fprintf('\n=== TESTE 4: Druyvesteyn ===\n\n');
+if run_maxwellian_const_v
+    fprintf('\n=== TESTE 4: Maxwellian (nu=const) ===\n\n');
     
     % Verificar se a secção eficaz especial existe
     fprintf('  Verificando secção eficaz para nu=const...\n');
-    if ~exist('Input/Druyvesteyn/constant_nu_elastic.txt', 'file')
-        fprintf('  AVISO: Secção eficaz Druyvesteyn não encontrada!\n');
+    if ~exist('Input/Maxwellian_const_v/constant_nu_elastic.txt', 'file')
+        fprintf('  AVISO: Secção eficaz Maxwellian_const_v não encontrada!\n');
         fprintf('  Por favor, execute manualmente antes de continuar:\n');
-        fprintf('    >> generate_druyvesteyn_cross_section\n\n');
-        fprintf('  Pulando teste Druyvesteyn...\n');
+        fprintf('    >> generate_maxwellian_const_v_cross_section\n\n');
+        fprintf('  Pulando teste Maxwellian_const_v...\n');
     else
         fprintf('  ✓ Secção eficaz encontrada\n');
         
         % Malha variável
         fprintf('  Executando malha VARIÁVEL...\n');
         try
-            run_analytical_test('druyvesteyn', 'variable', output_base);
+            run_analytical_test('maxwellian_const_v', 'variable', output_base);
             fprintf('  ✓ OK\n');
         catch ME
             fprintf('  ✗ ERRO: %s\n', ME.message);
@@ -211,7 +211,7 @@ if run_druyvesteyn
         % Malha uniforme
         fprintf('  Executando malha UNIFORME...\n');
         try
-            run_analytical_test('druyvesteyn', 'uniform', output_base);
+            run_analytical_test('maxwellian_const_v', 'uniform', output_base);
             fprintf('  ✓ OK\n');
         catch ME
             fprintf('  ✗ ERRO: %s\n', ME.message);
@@ -243,15 +243,15 @@ function run_single_benchmark(test_type, grid_type, N, delta_u, output_base)
     % Determinar template de input
     if strcmp(test_type, 'benchmark_fixed_delta_u')
         if strcmp(grid_type, 'variable')
-            template = 'Input/benchmark_fixed_delta_u.in';
+            template = 'Input/benchmark/benchmark_fixed_delta_u.in';
         else
-            template = 'Input/benchmark_uniform_fixed_delta_u.in';
+            template = 'Input/benchmark/benchmark_uniform_fixed_delta_u.in';
         end
     elseif strcmp(test_type, 'benchmark_fixed_N')
         if strcmp(grid_type, 'variable')
-            template = 'Input/benchmark_fixed_N.in';
+            template = 'Input/benchmark/benchmark_fixed_N.in';
         else
-            template = 'Input/benchmark_uniform_fixed_N.in';
+            template = 'Input/benchmark/benchmark_uniform_fixed_N.in';
         end
     else
         error('Tipo de teste desconhecido: %s', test_type);
@@ -278,7 +278,7 @@ function run_single_benchmark(test_type, grid_type, N, delta_u, output_base)
     end
     
     % Criar nome de arquivo temporário
-    temp_file = sprintf('Input/temp_%s_%s_N%d_du%.0e.in', test_type, grid_type, N, delta_u);
+    temp_file = sprintf('Input/benchmark/temp_%s_%s_N%d_du%.0e.in', test_type, grid_type, N, delta_u);
     
     % Modificar pasta de output no conteúdo
     output_folder = sprintf('%s_%s_N%d_du%.0e', test_type, grid_type, N, delta_u);
@@ -300,10 +300,10 @@ function run_single_benchmark(test_type, grid_type, N, delta_u, output_base)
 end
 
 function run_analytical_test(test_name, grid_type, output_base)
-    % Executa um teste analítico (Maxwelliana ou Druyvesteyn)
+    % Executa um teste analítico (Maxwelliana ou Maxwellian_const_v)
     
     % Determinar arquivo de input
-    input_file = sprintf('Input/benchmark_%s_%s.in', test_name, grid_type);
+    input_file = sprintf('Input/benchmark/benchmark_%s_%s.in', test_name, grid_type);
     
     if ~exist(input_file, 'file')
         error('Arquivo de input não encontrado: %s', input_file);
@@ -319,7 +319,7 @@ function run_analytical_test(test_name, grid_type, output_base)
     content = regexprep(content, 'folder: benchmark_\w+', sprintf('folder: %s/%s', output_base, output_folder));
     
     % Criar arquivo temporário
-    temp_file = sprintf('Input/temp_%s_%s.in', test_name, grid_type);
+    temp_file = sprintf('Input/benchmark/temp_%s_%s.in', test_name, grid_type);
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);

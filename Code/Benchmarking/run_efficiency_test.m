@@ -21,8 +21,8 @@ firstEnergyStep = 1e-3;     % Para malha variável
 reduction_percentages = [100, 80, 60, 40, 30, 25, 20];
 
 % Template para teste (usar benchmark_fixed_delta_u como base)
-template_variable = 'Input/benchmark_fixed_delta_u.in';
-template_uniform = 'Input/benchmark_uniform_fixed_delta_u.in';
+template_variable = 'Input/benchmark/benchmark_fixed_delta_u.in';
+template_uniform = 'Input/benchmark/benchmark_uniform_fixed_delta_u.in';
 
 % Diretório de saída
 output_base = 'Output/efficiency_test';

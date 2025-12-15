@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   BENCHMARK: Druyvesteyn                          %
+%   BENCHMARK: Maxwellian (nu = const)              %
 %   E/N = 100 Td, eeCollisions = false, CAR = false%
 %   elasColl com nu = const (sigma ∝ 1/v)           %
-%   Solução analítica: Druyvesteyn a Te             %
+%   Solução analítica: Maxwellian a Te              %
 %   Malha UNIFORME                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -27,8 +27,8 @@ electronKinetics:
   ionizationOperatorType: conservative % conservative
   growthModelType: temporal            % temporal
   includeEECollisions: false           % FALSE - sem colisões e-e
-  LXCatFiles:                          % Secção eficaz especial Druyvesteyn + H2 para reconhecer
-    - Druyvesteyn/constant_nu_elastic.txt
+  LXCatFiles:                          % Secção eficaz especial Maxwellian_const_v (nu=const) + H2 para reconhecer
+    - Maxwellian_const_v/constant_nu_elastic.txt
   gasProperties:                       % properties of the gases (S.I. Units)
     mass: Databases/masses.txt
     fraction:
@@ -61,7 +61,7 @@ gui:
 output: 
   isOn: true
   dataFormat: txt % txt
-  folder: benchmark_druyvesteyn_uniform
+  folder: benchmark_maxwellian_const_v_uniform
   dataSets:
     - log
     - eedf

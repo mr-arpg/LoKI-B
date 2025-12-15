@@ -1,10 +1,11 @@
-% Script para gerar secção eficaz para teste Druyvesteyn
+% Script para gerar secção eficaz para teste Maxwellian (nu = const)
 % Para obter nu = const, precisamos de sigma(v) ∝ 1/v
 % nu = N * sigma(v) * v = N * sigma_0 * (v_0/v) * v = N * sigma_0 * v_0 = const
+% Esta configuração resulta numa distribuição Maxwelliana, não Druyvesteyn
 
 clear; clc;
 
-fprintf('=== Generating Druyvesteyn Cross Section ===\n');
+fprintf('=== Generating Maxwellian (nu=const) Cross Section ===\n');
 
 % Constantes
 eV_to_J = 1.60218e-19;  % conversão eV para Joules
@@ -32,31 +33,33 @@ cross_section = sigma_0 * v_0 * sqrt(me ./ (2 * energy_J));
 % Já está em m^2
 
 % Criar directório se não existir
-if ~exist('Input/Druyvesteyn', 'dir')
-    mkdir('Input/Druyvesteyn');
+if ~exist('Input/Maxwellian_const_v', 'dir')
+    mkdir('Input/Maxwellian_const_v');
 end
 
 % Escrever ficheiro no formato LXCat
-filename = 'Input/Druyvesteyn/constant_nu_elastic.txt';
+filename = 'Input/Maxwellian_const_v/constant_nu_elastic.txt';
 fid = fopen(filename, 'w');
 
 % Cabeçalho no estilo LXCat (seguindo o formato do H2_LXCat.txt)
 fprintf(fid, 'LXCat, www.lxcat.net\n');
 fprintf(fid, 'Generated on %s. All rights reserved.\n\n', datestr(now, 'dd mmm yyyy'));
 fprintf(fid, 'RECOMMENDED REFERENCE FORMAT\n');
-fprintf(fid, '- Druyvesteyn test database, custom cross section for constant collision frequency.\n\n');
+fprintf(fid, '- Maxwellian (nu=const) test database, custom cross section for constant collision frequency.\n\n');
 fprintf(fid, 'CROSS SECTION DATA FORMAT\n');
 fprintf(fid, 'Custom elastic cross section designed to ensure constant collision frequency nu = N*sigma*v = const.\n');
-fprintf(fid, 'This is achieved by making sigma(v) proportional to 1/v.\n\n');
+fprintf(fid, 'This is achieved by making sigma(v) proportional to 1/v.\n');
+fprintf(fid, 'Note: This configuration results in a Maxwellian distribution, not a Druyvesteyn distribution.\n\n');
 fprintf(fid, '********************************************************** H2 **********************************************************\n\n');
 fprintf(fid, 'ELASTIC\n');
 fprintf(fid, 'H2\n');
 fprintf(fid, ' 2.743480e-4\n');  % m/M ratio (electron mass / H2 mass)
 fprintf(fid, 'SPECIES: e / H2\n');
-fprintf(fid, 'PROCESS: E + H2 -> E + H2, Elastic (Druyvesteyn test)\n');
+fprintf(fid, 'PROCESS: E + H2 -> E + H2, Elastic (Maxwellian nu=const test)\n');
 fprintf(fid, 'PARAM.:  m/M = 0.000274348, sigma(v) proportional to 1/v\n');
-fprintf(fid, 'COMMENT: [E + H2(X) -> E + H2(X), Elastic] Custom cross section for Druyvesteyn test.\n');
+fprintf(fid, 'COMMENT: [E + H2(X) -> E + H2(X), Elastic] Custom cross section for Maxwellian (nu=const) test.\n');
 fprintf(fid, 'COMMENT: Designed to ensure constant collision frequency nu = N * sigma * v = const.\n');
+fprintf(fid, 'COMMENT: Results in a Maxwellian distribution, not Druyvesteyn.\n');
 fprintf(fid, 'UPDATED: %s\n', datestr(now, 'yyyy-mm-dd HH:MM:SS'));
 fprintf(fid, 'COLUMNS: Energy (eV) | Cross section (m2)\n');
 fprintf(fid, '-----------------------------\n');
@@ -98,8 +101,8 @@ ylabel('Collision Frequency \nu (s^{-1})');
 title('Collision Frequency: \nu = N \sigma v');
 grid on;
 
-saveas(gcf, 'Input/Druyvesteyn/cross_section_verification.png');
-fprintf('Verification plot saved: Input/Druyvesteyn/cross_section_verification.png\n');
+saveas(gcf, 'Input/Maxwellian_const_v/cross_section_verification.png');
+fprintf('Verification plot saved: Input/Maxwellian_const_v/cross_section_verification.png\n');
 
 % Verificar que nu é aproximadamente constante
 fprintf('\nVerification:\n');

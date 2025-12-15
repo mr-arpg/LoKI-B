@@ -24,7 +24,7 @@ for i = 1:length(N_values)
     fprintf('Running simulation with N = %d...\n', N);
     
     % Read the template file
-    fid = fopen('Input/benchmark_fixed_delta_u.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_fixed_delta_u.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -32,7 +32,7 @@ for i = 1:length(N_values)
     content = regexprep(content, 'cellNumber: \d+', sprintf('cellNumber: %d', N));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_fixed_delta_u_N%d.in', N);
+    temp_file = sprintf('Input/benchmark/benchmark_fixed_delta_u_N%d.in', N);
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
@@ -76,7 +76,7 @@ for i = 1:length(delta_u_values)
     fprintf('Running simulation with delta u = %.1e eV...\n', delta_u);
     
     % Read the template file
-    fid = fopen('Input/benchmark_fixed_N.in', 'r');
+    fid = fopen('Input/benchmark/benchmark_fixed_N.in', 'r');
     content = fread(fid, '*char')';
     fclose(fid);
     
@@ -84,7 +84,7 @@ for i = 1:length(delta_u_values)
     content = regexprep(content, 'firstEnergyStep: [\d\.e-]+', sprintf('firstEnergyStep: %.1e', delta_u));
     
     % Write modified file
-    temp_file = sprintf('Input/benchmark_fixed_N_delta_u_%s.in', num2str(delta_u, '%.0e'));
+    temp_file = sprintf('Input/benchmark/benchmark_fixed_N_delta_u_%s.in', num2str(delta_u, '%.0e'));
     fid = fopen(temp_file, 'w');
     fprintf(fid, '%s', content);
     fclose(fid);
